@@ -1,63 +1,64 @@
+English| [简体中文](./README_cn.md)
+
 Getting Started with image_subscribe_example
 =======
 
 # Intro
 
-image_subscribe_example package用于显示接收 ROS2 Node 发布的image msg。支持ROS标准格式，也支持 share mem 方式订阅。
+The image_subscribe_example package is used to display image messages published by a ROS2 node. It supports ROS standard format and also supports subscribing via shared memory.
 
 # Build
 ---
 ## Dependency
 
-ros package：
+ROS packages:
 - sensor_msgs
 - hbm_img_msgs
 
-hbm_img_msgs pkg是在hobot_msgs中自定义的图片消息格式，用于shared mem场景下的图片传输。
+The hbm_img_msgs package is a custom image message format defined in hobot_msgs, used for image transmission in shared memory scenarios.
 
-## 开发环境
+## Development Environment
 
-- 编程语言: C/C++
-- 开发平台: X3/X86
-- 系统版本：Ubuntu 20.04
-- 编译工具链:Linux GCC 9.3.0/Linaro GCC 9.3.0
+- Programming Language: C/C++
+- Development Platform: X3/X86
+- System Version: Ubuntu 20.04
+- Compilation Toolchain: Linux GCC 9.3.0 / Linaro GCC 9.3.0
 
-## 编译
+## Compilation
 
-支持在X3 Ubuntu系统上编译和在PC上使用docker交叉编译两种方式，并支持通过编译选项控制编译pkg的依赖和pkg的功能。
-### 编译选项
+Supports compilation on an X3 Ubuntu system and cross-compilation on a PC using Docker, with the ability to control the package's dependencies and features through compilation options.
+
+### Compilation Options
 
 BUILD_HBMEM
 
-- shared mem（共享内存传输）使能开关，默认关闭（OFF），编译时使用-DBUILD_HBMEM=ON命令打开。
-- 如果打开，编译和运行会依赖hbm_img_msgs pkg，并且需要使用tros进行编译。
-- 如果关闭，编译和运行不依赖hbm_img_msgs pkg，支持使用原生ros和tros进行编译。
-- 对于shared mem通信方式，当前不支持订阅 compressed topic。
-- CMakeLists.txt中指定Mipi_cam package的安装路径，默认为`../install/image_subscribe_example`。
+- Enables the shared memory transmission feature, default is turned off (OFF), use the command -DBUILD_HBMEM=ON during compilation to turn it on.
+- If enabled, compilation and execution will depend on the hbm_img_msgs package, and tros needs to be used for compilation.
+- If disabled, compilation and execution do not depend on the hbm_img_msgs package, supporting compilation using native ROS and tros.
+- For shared memory communication, subscribing to compressed topics is currently not supported.
+- The CMakeLists.txt specifies the installation path of the Mipi_cam package, default is `../install/image_subscribe_example`.
 
-### X3 Ubuntu系统上编译
-1、编译环境确认
+### Compilation on X3 Ubuntu System
 
-- 板端已安装X3 Ubuntu系统。
-- 当前编译终端已设置TogetherROS环境变量：`source PATH/setup.bash`。其中PATH为TogetherROS的安装路径。
-- 已安装ROS2编译工具colcon，安装命令：`pip install -U colcon-common-extensions`
-- 已依赖pkg ，详见 Dependency 部分
+1. Environment Configuration:
+   - Ensure X3 Ubuntu system is installed on the board.
+   - Set the TogetherROS environment variable in the current compilation terminal: `source PATH/setup.bash`, where PATH is the installation path of TogetherROS.
+   - Install ROS2 compilation tool colcon with the command: `pip install -U colcon-common-extensions`.
+   - Ensure dependency on packages, as detailed in the Dependency section.
 
-2、编译：
-  - 订阅share mem 方式发布的图片：`colcon build --packages-select image_subscribe_example --cmake-args -DBUILD_HBMEM=ON`
-  这个需要先配置 TROS 环境，例如：`source /opt/tros/setup.bash`
-  - 支持订阅ROS2标准格式图片：`colcon build --packages-select image_subscribe_example`或`colcon build --packages-select image_subscribe_example --cmake-args -DBUILD_HBMEM=OFF`。
+2. Compilation Process:
+   - Subscribe to images published via shared memory: `colcon build --packages-select image_subscribe_example --cmake-args -DBUILD_HBMEM=ON`
+     This requires configuring the TROS environment first, for example: `source /opt/tros/setup.bash`.
+   - Support subscribing to images in ROS2 standard format: `colcon build --packages-select image_subscribe_example`, or `colcon build --packages-select image_subscribe_example --cmake-args -DBUILD_HBMEM=OFF`.### Docker Cross Compilation
 
-### docker交叉编译
+1. Confirming Compilation Environment
 
-1、编译环境确认
+- Compilation is done in docker with tros installed in the docker environment. For docker installation, cross compilation instructions, tros compilation and deployment instructions, please refer to the README.md in the robot development platform robot_dev_config repo.
+- hbm_img_msgs package has been compiled.
 
-- 在docker中编译，并且docker中已经安装好tros。docker安装、交叉编译说明、tros编译和部署说明详见机器人开发平台robot_dev_config repo中的README.md。
-- 已编译hbm_img_msgs package
+2. Compilation
 
-2、编译
-
-- 编译命令： 
+- Compilation Command:
 
   ```
   export TARGET_ARCH=aarch64
@@ -72,39 +73,38 @@ BUILD_HBMEM
      -DCMAKE_TOOLCHAIN_FILE=`pwd`/robot_dev_config/aarch64_toolchainfile.cmake \
      -DBUILD_HBMEM=ON
   ```
-- 其中SYS_ROOT为交叉编译系统依赖路径，此路径具体地址详见第1步“编译环境确认”的交叉编译说明。
+- SYS_ROOT in the cross-compilation system is the dependency path. For the specific address of this path, please refer to the cross-compilation instructions in the first step "Confirming Compilation Environment".
 
 # Usage
 
-## X3 Ubuntu系统
-编译成功后，将生成的install路径拷贝到地平线X3开发板上（如果是在X3上编译，忽略拷贝步骤），并执行如下命令运行
+## X3 Ubuntu System
+After successful compilation, copy the generated install path to the Horizon X3 development board (if compiling on X3, ignore the copying step), and run the following command:
 
 ```
 export COLCON_CURRENT_PREFIX=./install
 source ./install/local_setup.sh
 ros2 run image_subscribe_example subscribe_example
-#可以输入参数进行订阅并保存图片：默认是不保存图片，除非设置了save_dir参数
+# Subscribe and save images by specifying parameters: images are not saved by default unless the save_dir parameter is set
 ros2 run image_subscribe_example subscribe_example --ros-args -p sub_img_topic:=/image_raw/compressed -p save_dir:=/userdata
 
-指明topic 为 hbmem_img，接收 发布端通过share mem pub 的数据：
+Specify the topic as hbmem_img to receive data published by the publisher through share mem pub:
 ros2 run image_subscribe_example subscribe_example --ros-args -p sub_img_topic:=hbmem_img
 ```
 
-## X3 linaro系统
+## X3 Linaro System
 
-把在docker 交叉编译的install 目录拷贝到linaro 系统下，例如:/userdata
-需要首先指定依赖库的路径，例如：
+Copy the install directory compiled in docker cross compilation to the Linaro system, for example: /userdata
+First, specify the path to the dependency library, for example:
 `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/userdata/install/lib`
 
+Modify the path of ROS_LOG_DIR; otherwise, logs will be created in the /home directory. To create logs in /home, execute `mount -o remount,rw /`.```bash
+export ROS_LOG_DIR=/userdata/
 
-修改 ROS_LOG_DIR 的路径，否则会创建在 /home 目录下，需要执行 mount -o remount,rw /，才可以在 /home 下创建日志
-`export ROS_LOG_DIR=/userdata/`
-
-运行 subscribe_example
+Run subscribe_example
 ```
-// 默认参数方式
+// Default parameter mode
 /userdata/install/lib/image_subscribe_example/subscribe_example
-// 传参方式
+// Parameter passing mode
 #/userdata/install/lib/image_subscribe_example/subscribe_example --ros-args -p sub_img_topic:=hbmem_img
 
 ```
