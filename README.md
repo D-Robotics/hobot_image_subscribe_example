@@ -49,7 +49,9 @@ BUILD_HBMEM
 2. Compilation Process:
    - Subscribe to images published via shared memory: `colcon build --packages-select image_subscribe_example --cmake-args -DBUILD_HBMEM=ON`
      This requires configuring the TROS environment first, for example: `source /opt/tros/setup.bash`.
-   - Support subscribing to images in ROS2 standard format: `colcon build --packages-select image_subscribe_example`, or `colcon build --packages-select image_subscribe_example --cmake-args -DBUILD_HBMEM=OFF`.### Docker Cross Compilation
+   - Support subscribing to images in ROS2 standard format: `colcon build --packages-select image_subscribe_example`, or `colcon build --packages-select image_subscribe_example --cmake-args -DBUILD_HBMEM=OFF`.
+
+### Docker Cross Compilation
 
 1. Confirming Compilation Environment
 
